@@ -124,3 +124,92 @@ function getCurrentUser() {
     $stmt->execute([$_SESSION['user_id']]);
     return $stmt->fetch();
 }
+
+/**
+ * יצירת קובץ ZIP של תמונות מילים לשיר
+ * @param int $song_id מזהה השיר
+ * @return string|false נתיב לקובץ ZIP שנוצר או false במקרה של כישלון
+ */
+function createSongImagesZip($song_id) {
+    global $pdo;
+    
+    try {
+        // Get song details
+        $stmt = $pdo->prepare("SELECT title, title_he, title_en FROM songs WHERE id = ?");
+        $stmt->execute([$song_id]);
+        $song = $stmt->fetch();
+        
+        if (!$song) {
+            return false;
+        }
+        
+        // Get all images for this song
+        $stmt = $pdo->prepare("
+            SELECT image_path, page_number 
+            FROM song_images 
+            WHERE song_id = ? AND image_type = 'lyrics_page'
+            ORDER BY page_number ASC, display_order ASC
+        ");
+        $stmt->execute([$song_id]);
+        $images = $stmt->fetchAll();
+        
+        if (empty($images)) {
+            return false;
+        }
+        
+        // Create ZIP file
+        $zip = new ZipArchive();
+        $song_title = $song['title_he'] ?? $song['title_en'] ?? $song['title'];
+        $zip_filename = 'song_lyrics_' . $song_id . '_' . time() . '.zip';
+        $zip_path = __DIR__ . '/../public/uploads/temp/' . $zip_filename;
+        
+        // Ensure temp directory exists
+        if (!is_dir(dirname($zip_path))) {
+            mkdir(dirname($zip_path), 0755, true);
+        }
+        
+        if ($zip->open($zip_path, ZipArchive::CREATE) !== TRUE) {
+            return false;
+        }
+        
+        // Add images to ZIP
+        foreach ($images as $index => $image) {
+            $image_path = __DIR__ . '/../public' . $image['image_path'];
+            if (file_exists($image_path)) {
+                $page_num = $image['page_number'] ?? ($index + 1);
+                $extension = pathinfo($image_path, PATHINFO_EXTENSION);
+                $zip_image_name = sprintf("%s_page_%02d.%s", $song_title, $page_num, $extension);
+                $zip->addFile($image_path, $zip_image_name);
+            }
+        }
+        
+        $zip->close();
+        
+        return '/uploads/temp/' . $zip_filename;
+        
+    } catch (Exception $e) {
+        error_log('Error creating ZIP: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * ניקוי קבצי ZIP ישנים (מעל 24 שעות)
+ */
+function cleanOldZipFiles() {
+    $temp_dir = __DIR__ . '/../public/uploads/temp/';
+    if (!is_dir($temp_dir)) {
+        return;
+    }
+    
+    $files = glob($temp_dir . '*.zip');
+    $now = time();
+    
+    foreach ($files as $file) {
+        if (is_file($file)) {
+            if ($now - filemtime($file) >= 24 * 3600) { // 24 hours
+                unlink($file);
+            }
+        }
+    }
+}
