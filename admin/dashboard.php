@@ -48,9 +48,17 @@ $totalSongs = $pdo->query("SELECT COUNT(*) FROM songs")->fetchColumn();
         <div class="col-md-3">
             <div class="card text-center shadow">
                 <div class="card-body">
-                    <h5 class="card-title">שפריצי</h5>
-                    <p class="card-text display-4"><?= $totalSongs ?></p>
-                    <a href="../modules/songs/list.php" class="btn btn-primary">שלי</a>
+                    <h5 class="card-title">לוגואים</h5>
+                    <p class="card-text display-4">
+                        <?php
+                        try {
+                            echo $pdo->query("SELECT COUNT(*) FROM logos")->fetchColumn();
+                        } catch (PDOException $e) {
+                            echo '0';
+                        }
+                        ?>
+                    </p>
+                    <a href="../modules/logos/list.php" class="btn btn-primary">ניהול לוגואים</a>
                 </div>
             </div>
         </div>
@@ -71,8 +79,17 @@ $totalSongs = $pdo->query("SELECT COUNT(*) FROM songs")->fetchColumn();
                         <a href="../modules/clients/list.php" class="btn btn-outline-secondary">
                             <i class="bi bi-people"></i> ניהול לקוחות
                         </a>
-                        <a href="../modules/songs/list.php" class="btn btn-outline-secondary">
+                        <a href="../modules/songs/list.php" class="btn btn-outline-primary">
                             <i class="bi bi-music-note"></i> ניהול שירים
+                        </a>
+                        <a href="../modules/logos/list.php" class="btn btn-outline-info">
+                            <i class="bi bi-image"></i> ניהול לוגואים
+                        </a>
+                        <a href="../modules/plugins/list.php" class="btn btn-outline-success">
+                            <i class="bi bi-plugin"></i> ניהול פלאגינים
+                        </a>
+                        <a href="../modules/stories/list.php" class="btn btn-outline-warning">
+                            <i class="bi bi-film"></i> תוכן לסטוריז
                         </a>
                         <a href="../modules/stats/dashboard.php" class="btn btn-outline-secondary">
                             <i class="bi bi-bar-chart"></i> סטטיסטיקות
