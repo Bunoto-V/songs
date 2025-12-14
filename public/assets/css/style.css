@@ -1,35 +1,35 @@
-/* variables.css - הגדרות CSS כלליות */
+/* ================================================
+   Variables - מערכת עיצוב אחידה
+   ================================================ */
 :root {
-    /* צבעים ראשיים */
+    /* Color System */
     --primary: #FF6B2B;
     --primary-light: #FF8F5E;
     --primary-dark: #E85A1F;
     --secondary: #2D3142;
-    
-    /* צבעי טקסט */
-    --text-primary: #2D3142;
-    --text-secondary: #6B7280;
-    
-    /* צבעי רקע */
+    --secondary-light: #4A4F63;
     --background: #F5F6FA;
     --surface: #FFFFFF;
+    --text-primary: #2D3142;
+    --text-secondary: #6B7280;
     --border: #E2E8F0;
-    
-    /* צבעי מצב */
     --success: #4CAF50;
     --warning: #FFC107;
     --danger: #FF5252;
     --info: #2196F3;
     
-    /* הצללות */
+    /* Shadows */
     --shadow-sm: 0 2px 4px rgba(45, 49, 66, 0.05);
     --shadow-md: 0 4px 6px rgba(45, 49, 66, 0.1);
     --shadow-lg: 0 8px 16px rgba(45, 49, 66, 0.12);
     
-    /* עיגול קצוות */
+    /* Border Radius */
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 16px;
+    
+    /* Font */
+    --main-font: 'Almoni', Arial, sans-serif;
     
     /* גדלי גופן */
     --font-sm: 0.875rem;
@@ -38,11 +38,32 @@
     --font-xl: 2.5rem;
 }
 
+/* Font Face - Almoni */
+@font-face {
+    font-family: 'Almoni';
+    src: url('../fonts/almoni-tzar-aaa-300.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ================================================
+   Base Styles - סגנונות בסיס
+   ================================================ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 /* === Reset & Basics === */
 body {
-    background-color: var(--background);
-    font-family: 'Almoni', Arial, sans-serif;
+    font-family: var(--main-font);
+    background: linear-gradient(135deg, #2D3142, #FF6B2B);
+    min-height: 100vh;
     color: var(--text-primary);
+    direction: rtl;
+    line-height: 1.5;
 }
 
 .rtl {

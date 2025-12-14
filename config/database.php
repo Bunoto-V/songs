@@ -4,7 +4,7 @@
 define('DB_HOST', 'localhost');
 define('DB_USER', 'adm_tkc');
 define('DB_PASS', 'a1367$1661va');
-define('DB_NAME', 'social_management');
+define('DB_NAME', 'songs_management'); // מסד נתונים מאוחד
 
 try {
     $pdo = new PDO(

@@ -1,0 +1,36 @@
+# Uploaded files
+public/uploads/logos/*.png
+public/uploads/logos/*.jpg
+public/uploads/logos/*.jpeg
+public/uploads/logos/*.svg
+public/uploads/plugins/*
+public/uploads/temp/*
+public/uploads/images/*
+public/uploads/story_content/*
+songs/uploads/*
+
+# Keep directory structure
+!public/uploads/logos/.gitkeep
+!public/uploads/plugins/.gitkeep
+!public/uploads/temp/.gitkeep
+!public/uploads/images/.gitkeep
+!public/uploads/story_content/.gitkeep
+!songs/uploads/.gitkeep
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+# Config with sensitive data (if any)
+# config/database.local.php

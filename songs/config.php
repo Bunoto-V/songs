@@ -4,7 +4,7 @@
  *********************************/
 
 $host = "localhost";        // שם השרת
-$dbname = "my_songs_db";    // שם המסד
+$dbname = "songs_management";    // שם המסד המאוחד
 $user = "adm_tkc";          // שם המשתמש
 $pass = "a1367$1661va";     // סיסמה
 

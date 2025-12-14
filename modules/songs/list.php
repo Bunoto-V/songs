@@ -24,14 +24,17 @@ try {
     // Get all categories for the dropdown
     $categories = $pdo->query("SELECT * FROM categories ORDER BY category_name")->fetchAll();
 
-    // Get all songs with their categories
+    // Get all songs with their categories and image count
     $stmt = $pdo->query("
         SELECT 
             s.*,
-            c.category_name
+            c.category_name,
+            COUNT(DISTINCT si.id) as lyrics_images_count
         FROM songs s
         LEFT JOIN categories c ON s.category_id = c.id
-        ORDER BY s.title
+        LEFT JOIN song_images si ON s.id = si.song_id AND si.image_type = 'lyrics_page'
+        GROUP BY s.id
+        ORDER BY s.created_at DESC
     ");
     $songs = $stmt->fetchAll();
 } catch (PDOException $e) {
@@ -56,38 +59,90 @@ try {
             <thead>
                 <tr>
                     <th>שם השיר</th>
+                    <th>אמן</th>
                     <th>קטגוריה</th>
-                    <th width="150">תצוגה מקדימה</th>
-                    <th>תאריך העלאה</th>
-                    <th width="150">פעולות</th>
+                    <th>קישורים</th>
+                    <th width="150">נגן</th>
+                    <th>תאריך</th>
+                    <th width="200">פעולות</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($songs as $song): ?>
                 <tr>
-                    <td><?= htmlspecialchars($song['title']) ?></td>
+                    <td>
+                        <strong><?= htmlspecialchars($song['title']) ?></strong>
+                        <?php if ($song['title_he'] || $song['title_en']): ?>
+                            <br>
+                            <small class="text-muted">
+                                <?= htmlspecialchars($song['title_he'] ?? '') ?>
+                                <?= ($song['title_he'] && $song['title_en']) ? ' / ' : '' ?>
+                                <?= htmlspecialchars($song['title_en'] ?? '') ?>
+                            </small>
+                        <?php endif; ?>
+                    </td>
+                    <td><?= htmlspecialchars($song['artist'] ?? '-') ?></td>
                     <td><?= htmlspecialchars($song['category_name']) ?></td>
                     <td>
-                        <audio controls style="width: 150px">
-                            <source src="../../public<?= htmlspecialchars($song['file_path']) ?>" type="audio/mpeg">
-                            הדפדפן שלך לא תומך בנגן השמע
-                        </audio>
+                        <?php if ($song['youtube_link']): ?>
+                            <a href="<?= htmlspecialchars($song['youtube_link']) ?>" 
+                               target="_blank" 
+                               class="badge bg-danger text-white"
+                               title="YouTube">
+                                <i class="bi bi-youtube"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($song['google_drive_link']): ?>
+                            <a href="<?= htmlspecialchars($song['google_drive_link']) ?>" 
+                               target="_blank" 
+                               class="badge bg-primary text-white"
+                               title="Google Drive">
+                                <i class="bi bi-cloud"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($song['lyrics_images_count'] > 0): ?>
+                            <span class="badge bg-info text-white" title="תמונות מילים">
+                                <i class="bi bi-images"></i> <?= $song['lyrics_images_count'] ?>
+                            </span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?php if ($song['file_path']): ?>
+                            <audio controls style="width: 150px">
+                                <source src="../../public<?= htmlspecialchars($song['file_path']) ?>" type="audio/mpeg">
+                                הדפדפן שלך לא תומך בנגן השמע
+                            </audio>
+                        <?php else: ?>
+                            <small class="text-muted">קישור בלבד</small>
+                        <?php endif; ?>
                     </td>
                     <td><?= date('d/m/Y', strtotime($song['created_at'])) ?></td>
                     <td>
                         <div class="btn-group">
-                            <a href="../../public<?= htmlspecialchars($song['file_path']) ?>" 
-                               class="btn btn-sm btn-success"
-                               download>
-                                <i class="bi bi-download"></i>
-                            </a>
+                            <?php if ($song['file_path']): ?>
+                                <a href="../../public<?= htmlspecialchars($song['file_path']) ?>" 
+                                   class="btn btn-sm btn-success"
+                                   download
+                                   title="הורד שיר">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                            <?php endif; ?>
+                            <?php if ($song['lyrics_images_count'] > 0): ?>
+                                <a href="download_zip.php?id=<?= $song['id'] ?>" 
+                                   class="btn btn-sm btn-info"
+                                   title="הורד ZIP של מילים">
+                                    <i class="bi bi-file-zip"></i>
+                                </a>
+                            <?php endif; ?>
                             <a href="edit.php?id=<?= htmlspecialchars($song['id']) ?>" 
-                               class="btn btn-sm btn-outline-primary">
+                               class="btn btn-sm btn-warning"
+                               title="ערוך">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <button type="button" 
-                                    class="btn btn-sm btn-outline-danger"
-                                    onclick="deleteSong(<?= htmlspecialchars($song['id']) ?>)">
+                                    class="btn btn-sm btn-danger"
+                                    onclick="deleteSong(<?= htmlspecialchars($song['id']) ?>)"
+                                    title="מחק">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
@@ -143,9 +198,9 @@ $(document).ready(function() {
         language: {
             url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/he.json'
         },
-        order: [[0, 'asc']],
+        order: [[5, 'desc']], // Order by date descending
         columnDefs: [
-            { orderable: false, targets: [2, 4] }
+            { orderable: false, targets: [3, 4, 6] } // Links, Player, Actions
         ]
     });
 });

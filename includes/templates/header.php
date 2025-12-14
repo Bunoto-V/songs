@@ -65,15 +65,31 @@ if (!$currentUser) {
                                     <i class="bi bi-tags"></i> ניהול קטגוריות
                                 </a>
                             </li>
-                            </li>
+                            <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" href="https://bunoto.com/social/c/modules/songs/list.php">
                                     <i class="bi bi-music-note"></i> ניהול שירים
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="https://bunoto.com/social/c/modules/clients/list.php">
+                                <a class="dropdown-item" href="https://bunoto.com/social/c/modules/logos/list.php">
                                     <i class="bi bi-image"></i> ניהול לוגואים
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="https://bunoto.com/social/c/modules/plugins/list.php">
+                                    <i class="bi bi-plugin"></i> ניהול פלאגינים
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="https://bunoto.com/social/c/modules/stories/list.php">
+                                    <i class="bi bi-film"></i> תוכן לסטוריז
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="https://bunoto.com/social/c/modules/clients/list.php">
+                                    <i class="bi bi-people"></i> ניהול לקוחות
                                 </a>
                             </li>
                         </ul>
