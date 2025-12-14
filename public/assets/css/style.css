@@ -47,15 +47,6 @@
     font-display: swap;
 }
 
-/* Font Face - Almoni */
-@font-face {
-    font-family: 'Almoni';
-    src: url('../fonts/almoni-tzar-aaa-300.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
-}
-
 /* ================================================
    Base Styles - סגנונות בסיס
    ================================================ */

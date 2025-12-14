@@ -159,6 +159,13 @@ $(document).ready(function() {
     });
 });
 
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 function previewStory(id) {
     fetch("get_story.php?id=" + id)
         .then(response => response.json())
@@ -169,22 +176,24 @@ function previewStory(id) {
                     <div class="row">
                         <div class="col-md-6">
                             <h6>פרטים:</h6>
-                            <p><strong>כותרת:</strong> ${story.title}</p>
-                            <p><strong>סוג תוכן:</strong> ${story.content_type}</p>
-                            <p><strong>תיאור:</strong> ${story.description || "-"}</p>
-                            <p><strong>תבנית:</strong> ${story.template_name || "-"}</p>
+                            <p><strong>כותרת:</strong> ${escapeHtml(story.title)}</p>
+                            <p><strong>סוג תוכן:</strong> ${escapeHtml(story.content_type)}</p>
+                            <p><strong>תיאור:</strong> ${escapeHtml(story.description || "-")}</p>
+                            <p><strong>תבנית:</strong> ${escapeHtml(story.template_name || "-")}</p>
                         </div>
                         <div class="col-md-6">
                 `;
                 
                 if (story.background_image) {
-                    html += `<img src="../../public${story.background_image}" class="img-fluid mb-2">`;
+                    const safePath = escapeHtml(story.background_image);
+                    html += `<img src="../../public${safePath}" class="img-fluid mb-2" alt="Background">`;
                 }
                 
                 if (story.music_file_path) {
+                    const safePath = escapeHtml(story.music_file_path);
                     html += `
                         <audio controls class="w-100">
-                            <source src="../../public${story.music_file_path}" type="audio/mpeg">
+                            <source src="../../public${safePath}" type="audio/mpeg">
                         </audio>
                     `;
                 }

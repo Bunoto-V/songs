@@ -7,7 +7,7 @@ header('Content-Type: application/json');
 try {
     $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
     
-    if (!$id) {
+    if (!$id || $id <= 0) {
         throw new Exception('ID לא תקין');
     }
     
