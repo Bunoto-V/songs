@@ -15,11 +15,11 @@ function requireLogin() {
     }
 }
 
-// הגדרת מערך הרשאות גלובלי
-$GLOBALS['userPermissions'] = [
-    'admin' => ['manage_users', 'manage_clients', 'manage_categories', 'manage_songs'],
-    'manager' => ['manage_clients', 'manage_categories', 'manage_songs'],
-    'user' => ['view_songs']
+// הגדרת מערך הרשאות גלובלי לפי תפקיד
+$GLOBALS['rolePermissions'] = [
+    'admin' => ['manage_users', 'manage_clients', 'manage_categories', 'manage_songs', 'manage_logos', 'manage_plugins', 'manage_stories'],
+    'editor' => ['manage_clients', 'manage_categories', 'manage_songs', 'manage_logos', 'manage_plugins', 'manage_stories'],
+    'viewer' => ['view_songs', 'view_logos', 'view_plugins']
 ];
 
 function hasPermission($permission) {
@@ -29,29 +29,38 @@ function hasPermission($permission) {
         return false;
     }
 
-    // Get user's role and permissions
-    $stmt = $pdo->prepare("
-        SELECT r.role_name, rp.permission_id
-        FROM users u
-        LEFT JOIN roles r ON u.role_id = r.id
-        LEFT JOIN role_permissions rp ON r.id = rp.role_id
-        WHERE u.id = ?
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
-    $rolePermissions = $stmt->fetchAll(PDO::FETCH_COLUMN, 1);
-
-    // Check for direct user permissions
-    $stmt = $pdo->prepare("
-        SELECT up.permission_id
-        FROM user_permissions up
-        WHERE up.user_id = ?
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
-    $userPermissions = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
-
-    // Merge permissions and check
-    $allPermissions = array_merge($rolePermissions, $userPermissions);
-    return in_array($permission, $allPermissions);
+    try {
+        // Get user's role
+        $stmt = $pdo->prepare("
+            SELECT r.role_name
+            FROM users u
+            LEFT JOIN roles r ON u.role_id = r.id
+            WHERE u.id = ?
+        ");
+        $stmt->execute([$_SESSION['user_id']]);
+        $result = $stmt->fetch();
+        
+        if (!$result || !$result['role_name']) {
+            return false;
+        }
+        
+        $roleName = $result['role_name'];
+        
+        // Check if role has permission
+        if (isset($GLOBALS['rolePermissions'][$roleName])) {
+            return in_array($permission, $GLOBALS['rolePermissions'][$roleName]);
+        }
+        
+        // Admin has all permissions
+        if ($roleName === 'admin') {
+            return true;
+        }
+        
+        return false;
+    } catch (PDOException $e) {
+        error_log("Permission check error: " . $e->getMessage());
+        return false;
+    }
 }
 
 function requirePermission($permission) {
